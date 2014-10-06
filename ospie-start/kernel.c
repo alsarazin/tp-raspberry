@@ -10,7 +10,7 @@ void funcA()
 void funcB()
 {
 	int cptB = 1;
-	while ( 1 ) {
+	while ( cptB <=1 ) {
 		cptB += 2 ;
 		ctx_switch();
 	}
@@ -23,6 +23,9 @@ int kmain ( void )
 	create_process(funcA, NULL, STACK_SIZE);
 	start_sched();
 	ctx_switch();
+
+	while (1)
+		;
 
 	/* Pas atteignable vues nos 2 fonctions */
 	return 0;

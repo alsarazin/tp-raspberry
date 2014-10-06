@@ -9,8 +9,8 @@ typedef enum {NEW, READY, RUNNING, WAITING, TERMINATED} State;
 
 typedef struct ctx_s ctx_s;
 struct ctx_s {
-	unsigned int stackPointer;
-	unsigned int linkR;
+	unsigned int sp;
+	unsigned int lr;
 };
 
 typedef struct pcb_s pcb_s;
@@ -20,18 +20,18 @@ struct pcb_s {
 	void* functionArgs; 
 	ctx_s* ctx;
 	unsigned int stack_size;
-	struct pcb_s* next;
+	pcb_s* next;
+	pcb_s* previous;
 };
 
-struct ctx_s* current_ctx;
 pcb_s* current_process;
 
 pcb_s* first;
 pcb_s* last;
 
-void init_ctx(struct ctx_s*, func_t, unsigned int);
+void init_ctx(struct ctx_s*, unsigned int);
 
-void init_pcb(pcb_s*, func_t, void*, ctx_s*, unsigned int);
+void init_pcb(pcb_s*, func_t, void*, unsigned int);
 
 void create_process(func_t, void*, unsigned int);
 
