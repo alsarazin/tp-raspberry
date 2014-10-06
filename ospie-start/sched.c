@@ -7,36 +7,12 @@ void init_ctx(struct ctx_s* ctx, func_t f, unsigned int stack_size){
         ctx->linkR = (unsigned int) start_current_process;
 }
 
-/*void __attribute__ ((naked)) switch_to(struct ctx_s* ctx){
-
-	//1. Sauvegarder le contexte courant
-	__asm("push {r0-r12}");	
-
-	__asm("mov %0, sp" : "=r"(current_ctx->stackPointer));	
-	__asm("mov %0, lr" : "=r"(current_ctx->linkR));
-
-	//2. Changer de contexte courant 
-	//(faire pointer current_ctx vers le contexte ctx passé en paramètre)
-	current_ctx = ctx;
-
-	//3. Restaurer ce nouveau contexte
-
-	__asm("mov sp, %0" : : "r"(current_ctx->stackPointer));	
-	__asm("mov lr, %0" : : "r"(current_ctx->linkR));
-	
-	__asm("pop {r0-r12}");
-
-	//4. Sauter à l’adresse de retour du contexte restauré
-	__asm("bx lr");
-
-}*/
-
 void init_pcb(pcb_s* aPCB, func_t f, void* args, ctx_s* ctx, unsigned int stackSize){
 	
-	aPCB->state=NEW;
+	aPCB->state = NEW;
 	aPCB->function = f;
-	aPCB->functionArgs=args;
-	aPCB->ctx=ctx;
+	aPCB->functionArgs = args;
+	aPCB->ctx = ctx;
 	aPCB->stack_size = stackSize;
 }
 

@@ -31,8 +31,6 @@ pcb_s* last;
 
 void init_ctx(struct ctx_s*, func_t, unsigned int);
 
-//void __attribute__ ((naked)) switch_to(struct ctx_s* ctx);
-
 void init_pcb(pcb_s*, func_t, void*, ctx_s*, unsigned int);
 
 void create_process(func_t, void*, unsigned int);
