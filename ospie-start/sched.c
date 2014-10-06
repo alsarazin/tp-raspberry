@@ -76,8 +76,13 @@ void start_sched(){
 }
 
 void ctx_switch_from_irq(){
-	//TODO
-	while (1);
+	__asm("sub lr, lr, #4");
+	__asm("srsdb sp!, #0x13");
+	__asm("cps #0x13");
+
+	//TODO faire des choses
+
+	//TODO appeler RFE
 }
 
 void __attribute__ ((naked)) ctx_switch(){
