@@ -41,6 +41,8 @@ void elect();
 
 void start_sched();
 
+void ctx_switch_from_irq();
+
 void __attribute__ ((naked)) ctx_switch();
 
 #endif

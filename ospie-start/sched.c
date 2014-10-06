@@ -1,5 +1,6 @@
 #include "sched.h"
 #include "phyAlloc.h"
+#include "hw.h"
 
 
 void init_ctx(struct ctx_s* ctx, unsigned int stack_size){
@@ -70,6 +71,13 @@ void elect(){
 
 void start_sched(){
 	current_process=first;
+	ENABLE_IRQ();
+	set_tick_and_enable_timer();
+}
+
+void ctx_switch_from_irq(){
+	//TODO
+	while (1);
 }
 
 void __attribute__ ((naked)) ctx_switch(){
