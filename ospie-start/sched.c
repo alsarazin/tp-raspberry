@@ -22,7 +22,8 @@ void init_pcb(pcb_s* aPCB, func_t f, void* args, unsigned int stackSize){
 }
 
 void create_process(func_t f, void* args, unsigned int stack_size){
-	
+	DISABLE_IRQ();
+
 	pcb_s* pcb = phyAlloc_alloc(sizeof(pcb_s));
 
 	init_pcb(pcb, f, args, stack_size);
@@ -39,8 +40,9 @@ void create_process(func_t f, void* args, unsigned int stack_size){
 		last = pcb;
 		last->next = first;
 		first->previous=last;
-
 	}
+	set_tick_and_enable_timer();
+	ENABLE_IRQ();
 }
 
 void start_current_process(){
@@ -75,14 +77,36 @@ void start_sched(){
 	set_tick_and_enable_timer();
 }
 
-void ctx_switch_from_irq(){
+void __attribute__ ((naked)) ctx_switch_from_irq(){
+	
+	DISABLE_IRQ();
+
 	__asm("sub lr, lr, #4");
 	__asm("srsdb sp!, #0x13");
 	__asm("cps #0x13");
 
-	//TODO faire des choses
+	__asm("push {r0-r12}");
+	if(current_process->state == RUNNING){
+		__asm("mov %0, sp" : "=r"(current_process->ctx->sp));	
+		__asm("mov %0, lr" : "=r"(current_process->ctx->lr));
+	}
 
-	//TODO appeler RFE
+	//2. demande au scheduler d’élire un nouveau processus
+	elect();
+
+	//3. restaure le contexte du processus élu
+	__asm("mov sp, %0" : : "r"(current_process->ctx->sp));	
+	__asm("mov lr, %0" : : "r"(current_process->ctx->lr));
+
+	__asm("pop {r0-r12}");
+
+	set_tick_and_enable_timer();
+	ENABLE_IRQ();	
+	
+	if(current_process->state == NEW){
+		start_current_process();	
+	}
+	__asm("rfeia sp!");	
 }
 
 void __attribute__ ((naked)) ctx_switch(){
@@ -93,7 +117,6 @@ void __attribute__ ((naked)) ctx_switch(){
 	if(current_process->state == RUNNING){
 		__asm("mov %0, sp" : "=r"(current_process->ctx->sp));	
 		__asm("mov %0, lr" : "=r"(current_process->ctx->lr));
-
 	}
 
 	//2. demande au scheduler d’élire un nouveau processus
